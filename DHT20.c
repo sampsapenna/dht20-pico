@@ -27,6 +27,7 @@ int DHT20_init(DHT20 *sens)
     sens->status = 0;
     sens->lastRequest = 0;
     sens->lastRead = 0;
+    sens->updateInterval=1500;
     sens->crc = 0;
     memset(sens->bytes, 0, 7);
 
@@ -125,6 +126,37 @@ int convert(DHT20 *sens)
     return DHT20_OK;
 }
 
+
+// function that can be called every cycle in the loop. function does not sleep
+int updateMeasurement(DHT20 *sens){
+    int status;
+    if (to_ms_since_boot(get_absolute_time()) - sens->lastRequest > sens->updateInterval) {
+        status=startMeasurement(sens);
+        sens->lastRequest=to_ms_since_boot(get_absolute_time());
+    }
+    
+    if (status != DHT20_OK)
+    {
+        return status;
+    }
+
+    if (to_ms_since_boot(get_absolute_time()) - sens->lastRequest > 100){
+        if (to_ms_since_boot(get_absolute_time()) - sens->lastRead > 1000){
+            status=readMeasurement(sens);
+            convert(sens);
+        }
+    }
+
+    if (status != DHT20_OK)
+    {
+        return status;
+    }
+
+    return DHT20_OK;
+}
+
+
+
 int getMeasurement(DHT20 *sens)
 {
     int status;
@@ -178,6 +210,11 @@ void setHumOffset(struct DHT20 *sens, float offset)
 void setTempOffset(struct DHT20 *sens, float offset)
 {
     sens->tempOffset = offset;
+};
+
+void setUpdateInterval(struct DHT20 *sens, uint8_t time)
+{
+    sens->updateInterval=time;
 };
 
 float getHumOffset(DHT20 *sens)
@@ -240,4 +277,7 @@ static uint8_t _crc8(uint8_t *ptr, uint8_t len)
         }
     }
     return crc;
+}
+int main(){
+    return 0;
 }
