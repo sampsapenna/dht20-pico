@@ -278,6 +278,3 @@ static uint8_t _crc8(uint8_t *ptr, uint8_t len)
     }
     return crc;
 }
-int main(){
-    return 0;
-}
