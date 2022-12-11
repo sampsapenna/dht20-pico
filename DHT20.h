@@ -44,6 +44,7 @@ typedef struct DHT20
     uint8_t status;
     uint32_t lastRequest;
     uint32_t lastRead;
+    uint32_t updateInterval;
     uint8_t bytes[7];
     uint8_t crc;
 } DHT20;
@@ -92,6 +93,11 @@ Take a complete measurement from the sensor without external timing
 int getMeasurement(DHT20 *sens);
 
 /*
+updateMeasurements this function does not sleep and updates based on the updateInterval variable
+*/
+int updateMeasurement(DHT20 *sens);
+
+/*
 Access the converted temperature & humidity
 */
 float getHumidity(DHT20 *sens);
@@ -104,6 +110,11 @@ void setHumOffset(DHT20 *sens, float offset);
 void setTempOffset(DHT20 *sens, float offset);
 float getHumOffset(DHT20 *sens);
 float getTempOffset(DHT20 *sens);
+
+/*
+set updateInterval for the updateMeasurement function. this interval should be over 1000ms
+*/
+void setUpdateInterval(struct DHT20 *sens, uint8_t time);
 
 /*
 Check the sensor status word
